@@ -68,14 +68,86 @@ router.delete('/users/:id', (req, res) => {
 
 //REST API
 //GET
-router.get("api/users", (req, res) => {
+router.get("/api/users", (req, res) => {
   User.findAll()
-      .then(user => {
+      .then(users => {
           res.status(200).json(users)
       })
 })
 
+// GET by ID
+router.get('/api/users/:id', (req, res) => {
+  User.findOne({
+      where: { id: req.params.id }
+  })
+      .then(users => {
+          res.status(200).json(users)
+      })
+})
 
+//POST
+
+router.post('/api/users', (req, res) => {
+  User.create({
+      username: req.body.username,
+      password: req.body.password,
+  })
+      .then(user => {
+          res.status(201).json(user)
+      }) .catch(err => {
+          res.status(422).json("Tidak bisa menambahkan user")
+      })
+})
+
+//PUT
+router.put('/api/users/:id', (req, res) => {
+  User.update({
+      username: req.body.username,
+      password: req.body.password,
+  }, {
+      where: { id: req.params.id }
+  })
+      .then(user => {
+          res.status(201).json(user)
+  })  .catch(err => {
+          res.status(422).json("Tidak bisa mengubah user")
+  })
+})
+
+//DELETE 
+router.delete('/api/users/:id', (req, res) => {
+  User.destroy({
+      where: { id: req.params.id }
+  })
+      .then(user => {
+          res.sendStatus(204)
+      }) .catch(err => {
+          res.status(422).json("Tidak bisa menghapus user")
+      })
+})
+
+// BIODATA USER ROUTE
+
+router.get("/biodata", (req, res) => {
+  res.render("pages/biodata/index");
+});
+
+router.get("/biodata", (req, res) => {
+  Biodata.findAll().then((biodata) => {
+    res.render("pages/biodata/index", {
+      biodata,
+    });
+  });
+});
+
+router.get("/biodata/create", (req, res) => {
+  Biodata.findAll({
+    order: [["name", "ASC"]],
+  }).then((biodata) => {
+    res.render("pages/biodata/create");
+  })
+  
+});
 
 
 
