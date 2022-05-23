@@ -1,11 +1,36 @@
 const express = require("express");
 const { User } = require("../models");
+const { Biodata } = require("../models");
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
     res.render("pages/login/login");
   });
+
+//LOGIN
+// router signin
+router.post("/login", (req, res) => {
+  User.findOne({
+    where: { 
+      username: req.body.floatingInput,
+      password: req.body.floatingPassword
+     }
+  }).then(user => {
+    if (user) {
+      User.findAll().then((users) => {
+        res.render("pages/users/index2", {
+          users,
+        });
+      });
+    } else {
+      res.status(422).json("Tidak ada user")
+    }
+  }).catch(err => {
+    console.log(err)
+    res.render("pages/login/login")
+  })
+})
 
 // USER GAME ROUTE
   router.get("/users", (req, res) => {
@@ -128,12 +153,15 @@ router.delete('/api/users/:id', (req, res) => {
 
 // BIODATA USER ROUTE
 
-router.get("/biodata", (req, res) => {
-  res.render("pages/biodata/index");
-});
+// router.get("/biodata", (req, res) => {
+//   res.render("pages/biodata/index");
+// });
 
 router.get("/biodata", (req, res) => {
-  Biodata.findAll().then((biodata) => {
+  Biodata.findAll({
+    order: [["firstName", "ASC"]],
+    include: ["user"],
+  }).then((biodata) => {
     res.render("pages/biodata/index", {
       biodata,
     });
@@ -141,13 +169,78 @@ router.get("/biodata", (req, res) => {
 });
 
 router.get("/biodata/create", (req, res) => {
-  Biodata.findAll({
-    order: [["name", "ASC"]],
-  }).then((biodata) => {
-    res.render("pages/biodata/create");
-  })
-  
+  User.findAll({
+    order: [["username", "ASC"]],
+  }).then((users) => {
+    res.render("pages/biodata/create", {
+      users,
+    });
+  });
 });
+
+router.post("/biodata", (req, res) => {
+  // Database tidak dapat menerima string kosong dalam memasukkan date
+  // Jadi harus dilakukan pengecekan untuk konversi string kosong jadi null
+  let birthOfDate;
+  if (!req.body.birthOfDate) {
+    birthOfDate = null;
+  } else {
+    birthOfDate = req.body.birthOfDate;
+  }
+
+  Biodata.create({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    birthOfDate: req.body.birthOfDate,
+    phoneNumber: req.body.phoneNumber,
+    email: req.body.email,
+    address: req.body.address,
+    userId: req.body.userId,
+  }).then(() => {
+    res.redirect("/biodata");
+  });
+});
+
+router.get("/biodata/:id", (req, res) => {
+  Biodata.findOne({
+    where: { id: req.params.id },
+  }).then((biodata) => {
+    res.render("pages/biodata/show", {
+    biodata,
+    });
+  });
+});
+
+router.get("/biodata/:id/edit", (req, res) => {
+  Biodata.findOne({
+    where: { id: req.params.id },
+  }).then((biodata) => {
+    res.render("pages/suppliers/edit", {
+    supplier,
+    });
+  });
+});
+
+//REST API
+//GET
+router.get("/api/biodata", (req, res) => {
+  Biodata.findAll()
+      .then(biodata => {
+          res.status(200).json(biodata)
+      })
+})
+
+// GET by ID
+router.get('/api/biodata/:id', (req, res) => {
+  Biodata.findOne({
+      where: { id: req.params.id }
+  })
+      .then(biodata => {
+          res.status(200).json(biodata)
+      })
+})
+
+
 
 
 

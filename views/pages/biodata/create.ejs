@@ -16,7 +16,7 @@
 <body>
     <div>
       <h2 class="title-form">Register Biodata</h2>
-      <form method="POST" action="/users">
+      <form method="post" action="/biodata">
         <div class="mb-3">
           <label for="firstName" class="form-label">First Name</label>
           <input type="text" class="form-control" id="firstName" name="firstName" required>
@@ -42,14 +42,17 @@
             <input type="text" class="form-control" id="address" name="address" required>
         </div>
         <div class="mb-4">
-            <label for="supplier" class="form-label">Supplier</label>
-            <select class="form-select" aria-label="Supplier" name="supplierId" required>
-              <option selected disabled value="">-- Silahkan pilih --</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
+            <label for="user" class="form-label">User</label>
+            <select class="form-select" aria-label="User" name="userId" required>
+            <option selected disabled value="">-- Silahkan pilih --</option>
+              <% users.forEach((user) => { %>
+                <option value="<%= user.id %>">
+                    <%= user.username %>
+                </option>
+              <% }) %>
             </select>
           </div>
+
         <div class="col-12">
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>

@@ -14,8 +14,7 @@
 </head>
 <body>
     <div class="d-flex justify-content-between align-items-center">
-        <!-- <h3 class="m-0"><%= pageTitle %></h3> -->
-        <a class="btn btn-primary" href="/products/create" role="button">
+        <a class="btn btn-primary" href="/biodata/create" role="button">
           <i class="bi-plus-lg"></i> Buat Baru
         </a>
       </div>
@@ -29,16 +28,19 @@
               <th scope="col">Last Name</th>
               <th scope="col">Tanggal Lahir</th>
               <th scope="col">No. Handphone</th>
+              <th scope="col">User Account Name</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
+            <% biodata.forEach((biodata, index) => { %>
             <tr>
-              <th scope="row">1</th>
-              <td class="w-75">Masker Medis</td>
-              <td>10000</td>
-              <td>5</td>
-              <td class="w-25">PT. Mitra Utama</td>
+              <th scope="row"><%= index + 1 %></th>
+              <td class="w-75"><%= biodata.firstName %></td>
+              <td><%= biodata.lastName %></td>
+              <td><%= biodata.birthOfDate %></td>
+              <td><%= biodata.phoneNumber %></td>
+              <td><%= biodata.user.username %></td>
               <td>
                 <div class="d-flex gap-2 text-nowrap">
                   <a class="btn btn-success btn-sm" href="/products/1" role="button">
@@ -55,50 +57,7 @@
                 </div>
               </td>
             </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td class="w-75">Laptop Macbook</td>
-              <td>20000000</td>
-              <td>1</td>
-              <td class="w-25">PT. Mitra Utama</td>
-              <td>
-                <div class="d-flex gap-2 text-nowrap">
-                  <a class="btn btn-success btn-sm" href="/products/1" role="button">
-                    <i class="bi-eye-fill"></i> Lihat Detail
-                  </a>
-      
-                  <a class="btn btn-primary btn-sm" href="/products/1/edit" role="button">
-                    <i class="bi-pencil-fill"></i> Edit
-                  </a>
-      
-                  <a class="btn btn-danger btn-sm" role="button">
-                    <i class="bi-trash-fill"></i> Hapus
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td class="w-75">Voucher Google Play</td>
-              <td>20000</td>
-              <td>30</td>
-              <td class="w-25">PT. Mitra Utama</td>
-              <td>
-                <div class="d-flex gap-2 text-nowrap">
-                  <a class="btn btn-success btn-sm" href="/products/1" role="button">
-                    <i class="bi-eye-fill"></i> Lihat Detail
-                  </a>
-      
-                  <a class="btn btn-primary btn-sm" href="/products/1/edit" role="button">
-                    <i class="bi-pencil-fill"></i> Edit
-                  </a>
-      
-                  <a class="btn btn-danger btn-sm" role="button">
-                    <i class="bi-trash-fill"></i> Hapus
-                  </a>
-                </div>
-              </td>
-            </tr>
+            <% }) %>
           </tbody>
         </table>
       </div>
