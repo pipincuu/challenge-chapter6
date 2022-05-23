@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "superuser",
+    "database": "challenge_ch6_development",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "superuser",
+    "database": "challenge_ch6_test",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "superuser",
+    "database": "challenge_ch6_production",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}
