@@ -40,20 +40,22 @@
               <td><%= biodata.lastName %></td>
               <td><%= biodata.birthOfDate %></td>
               <td><%= biodata.phoneNumber %></td>
-              <td><%= biodata.user.username %></td>
+              <td><%= biodata.User.username %></td>
               <td>
                 <div class="d-flex gap-2 text-nowrap">
-                  <a class="btn btn-success btn-sm" href="/products/1" role="button">
+                  <a class="btn btn-success btn-sm" href="/biodata/<%= biodata.id %>" role="button">
                     <i class="bi-eye-fill"></i> Lihat Detail
                   </a>
       
-                  <a class="btn btn-primary btn-sm" href="/products/1/edit" role="button">
+                  <a class="btn btn-primary btn-sm" href="/biodata/<%= biodata.id %>/edit" role="button">
                     <i class="bi-pencil-fill"></i> Edit
                   </a>
       
-                  <a class="btn btn-danger btn-sm" role="button">
-                    <i class="bi-trash-fill"></i> Hapus
-                  </a>
+                  <form action="/biodata/<%= biodata.id %>?_method=DELETE" method="post">
+                    <button class="btn btn-danger btn-sm" type="submit">
+                      <i class="bi-trash-fill"></i> Hapus
+                    </button>
+                  </form>
                 </div>
               </td>
             </tr>

@@ -1,26 +1,27 @@
 const express = require("express");
-const { User } = require("../models");
-const { Biodata } = require("../models");
+const req = require("express/lib/request");
+const res = require("express/lib/response");
+const { User, Biodata, History, Admin } = require("../models");
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
-    res.render("pages/login/login");
+    res.render("pages/admin/login");
   });
 
 //LOGIN
 // router signin
 router.post("/login", (req, res) => {
-  User.findOne({
+  Admin.findOne({
     where: { 
-      username: req.body.floatingInput,
-      password: req.body.floatingPassword
+      username: req.body.username,
+      password: req.body.password
      }
-  }).then(user => {
-    if (user) {
-      User.findAll().then((users) => {
-        res.render("pages/users/index2", {
-          users,
+  }).then(admin => {
+    if (admin) {
+      Admin.findAll().then((admin) => {
+        res.render("pages/admin/index", {
+          admin,
         });
       });
     } else {
@@ -28,9 +29,69 @@ router.post("/login", (req, res) => {
     }
   }).catch(err => {
     console.log(err)
-    res.render("pages/login/login")
+    res.render("pages/admin/login")
   })
 })
+
+// ADMIN ROUTE
+
+router.get("/admin", (req, res) => {
+  Admin.findAll().then((admin) => {
+    res.render("pages/admin/index", {
+      admin,
+    });
+  });
+});
+
+router.get("/admin/create", (req, res) => {
+  res.render("pages/admin/create");
+});
+
+router.post('/admin', (req, res) => {
+  Admin.create({
+      username: req.body.username,
+      password: req.body.password
+  })
+      .then(() => {
+          res.redirect('/admin');
+      });
+});
+
+router.get("/admin/:id/edit", (req, res) => {
+  Admin.findOne({
+    where: { id: req.params.id },
+  }).then((admin) => {
+    res.render("pages/admin/edit", {
+    admin,
+    });
+  });
+});
+
+router.put('/admin/:id', (req, res) => {
+  Admin.update({
+      username: req.body.username,
+      password: req.body.password
+  },
+  {
+    where: {
+      id: req.params.id,
+    },
+  }
+    ).then(() => {
+          res.redirect('/admin');
+      });
+});
+
+router.delete('/admin/:id', (req, res) => {
+  Admin.destroy({
+      where: {
+        id: req.params.id,
+      },
+  })
+      .then(() => {
+          res.redirect('/admin');
+      });
+});
 
 // USER GAME ROUTE
   router.get("/users", (req, res) => {
@@ -94,7 +155,10 @@ router.delete('/users/:id', (req, res) => {
 //REST API
 //GET
 router.get("/api/users", (req, res) => {
-  User.findAll()
+  User.findAll({
+    order: [["username", "ASC"]],
+    include: ["Biodata"],
+  })
       .then(users => {
           res.status(200).json(users)
       })
@@ -103,6 +167,9 @@ router.get("/api/users", (req, res) => {
 // GET by ID
 router.get('/api/users/:id', (req, res) => {
   User.findOne({
+      include: ["Biodata"],
+  }, 
+  {
       where: { id: req.params.id }
   })
       .then(users => {
@@ -160,7 +227,7 @@ router.delete('/api/users/:id', (req, res) => {
 router.get("/biodata", (req, res) => {
   Biodata.findAll({
     order: [["firstName", "ASC"]],
-    include: ["user"],
+    include: ["User"],
   }).then((biodata) => {
     res.render("pages/biodata/index", {
       biodata,
@@ -204,6 +271,7 @@ router.post("/biodata", (req, res) => {
 router.get("/biodata/:id", (req, res) => {
   Biodata.findOne({
     where: { id: req.params.id },
+    include: ["User"],
   }).then((biodata) => {
     res.render("pages/biodata/show", {
     biodata,
@@ -211,34 +279,136 @@ router.get("/biodata/:id", (req, res) => {
   });
 });
 
-router.get("/biodata/:id/edit", (req, res) => {
-  Biodata.findOne({
+router.get("/biodata/:id/edit", async (req, res) => {
+  const biodata = await Biodata.findOne({
     where: { id: req.params.id },
-  }).then((biodata) => {
-    res.render("pages/suppliers/edit", {
-    supplier,
+  });
+
+  const users = await User.findAll({
+    order: [["username", "ASC"]],
+  });
+
+  res.render("pages/biodata/edit", {
+    biodata,
+    users,
+  });
+});
+
+    router.put("/biodata/:id", (req, res) => {
+    // Database tidak dapat menerima string kosong dalam memasukkan date
+    // Jadi harus dilakukan pengecekan untuk konversi string kosong jadi null
+      let birthOfDate;
+      if (!req.body.birthOfDate) {
+      birthOfDate = null;
+      } else {
+      birthOfDate = req.body.birthOfDate;
+      }
+    
+      Biodata.update({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      birthOfDate: req.body.birthOfDate,
+      phoneNumber: req.body.phoneNumber,
+      email: req.body.email,
+      address: req.body.address,
+      userId: req.body.userId,
+      },
+      {
+        where: { id: req.params.id,
+      },
+    }).then(() => {
+      res.redirect("/biodata");
     });
+});
+
+router.delete("/biodata/:id", (req, res) => {
+  Biodata.destroy({
+    where: {
+      id: req.params.id,
+    },
+  }).then(() => {
+    res.redirect("/biodata");
   });
 });
 
 //REST API
 //GET
+
 router.get("/api/biodata", (req, res) => {
-  Biodata.findAll()
-      .then(biodata => {
-          res.status(200).json(biodata)
-      })
-})
+  Biodata.findAll({
+    order: [["firstName", "ASC"]],
+    include: ["User"],
+  }).then((biodata) => {
+    res.json(biodata);
+  });
+});
 
 // GET by ID
 router.get('/api/biodata/:id', (req, res) => {
   Biodata.findOne({
+      order: [["firstName", "ASC"]],
+      include: ["User"],
+  },
+  {
       where: { id: req.params.id }
   })
       .then(biodata => {
           res.status(200).json(biodata)
       })
 })
+
+//POST
+
+router.post('/api/biodata', (req, res) => {
+  Biodata.create({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    birthOfDate: req.body.birthOfDate,
+    phoneNumber: req.body.phoneNumber,
+    email: req.body.email,
+    address: req.body.address,
+    userId: req.body.userId,
+  })
+      .then(biodata => {
+          res.status(201).json(biodata)
+      }) .catch(err => {
+          res.status(422).json("Tidak bisa menambahkan biodata")
+      })
+})
+
+//PUT
+router.put('/api/biodata/:id', (req, res) => {
+  Biodata.update({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    birthOfDate: req.body.birthOfDate,
+    phoneNumber: req.body.phoneNumber,
+    email: req.body.email,
+    address: req.body.address,
+    userId: req.body.userId,
+  }, {
+      where: { id: req.params.id }
+  })
+      .then(biodata => {
+          res.status(201).json(biodata)
+  })  .catch(err => {
+          res.status(422).json("Tidak bisa mengubah biodata")
+  })
+})
+
+//DELETE 
+router.delete('/api/biodata/:id', (req, res) => {
+  Biodata.destroy({
+      where: { id: req.params.id }
+  })
+      .then(biodata => {
+          res.sendStatus(204)
+      }) .catch(err => {
+          res.status(422).json("Tidak bisa menghapus biodata user")
+      })
+})
+
+
 
 
 

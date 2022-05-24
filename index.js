@@ -2,7 +2,7 @@ const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
 const methodOverride = require('method-override');
 const router = require("./router");
-const { User } = require("./models");
+const { User, Biodata, History, Admin } = require("./models");
 
 const PORT = 8888;
 
