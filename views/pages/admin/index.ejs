@@ -14,44 +14,63 @@
   <title>Data Admin</title>
 </head>
 <body>
-  <div class="d-flex justify-content-between align-items-center">
-    <a class="btn btn-primary" href="/admin/create" role="button">
-      <i class="bi-plus-lg"></i> Buat Baru
-    </a>
-  </div>
-  
-  <div class="table-responsive mt-3">
-    <table class="table table-bordered table-hover">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Username</th>
-          <th scope="col">Password</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% admin.forEach((admin, index) => { %>
-          <tr>
-            <th scope="row"><%= index + 1 %></th>
-            <td class="w-75"><%= admin.username %></td>
-            <td><%= admin.password %></td>
-            <td>
-                <a class="btn btn-primary btn-sm" href="/admin/<%= admin.id %>/edit" role="button">
-                  <i class="bi-pencil-fill"></i> Edit
-                </a>
-
-                <form action="/admin/<%= admin.id %>?_method=DELETE" method="post">
-                  <button class="btn btn-danger btn-sm" type="submit">
-                    <i class="bi-trash-fill"></i> Hapus
-                  </button>
-                </form>
-              </div>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+  <div class="d-flex h-100 text-center text-white bg-dark">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <header class="mb-auto">
+          <div class="bg-dark">
+            <h3 class="float-md-start mb-0">Dashboard</h3>
+            <nav class="nav nav-masthead justify-content-center float-md-end">
+              <a class="nav-link active text-white" href="/home">Home</a>
+              <a class="nav-link text-white" href="/users">User</a>
+              <a class="nav-link text-white" href="/biodata">Profiles</a>
+              <a class="nav-link text-white" href="/history">History</a>
+              <a class="nav-link text-white" href="/admin">Admin</a>
+            </nav>
+          </div>
+        </header>
+    </div>
+    </div>
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center py-2">
+        <a class="btn btn-primary" href="/admin/create" role="button">
+          <i class="bi-plus-lg"></i> Buat Baru
+        </a>
+      </div>
+      
+      <div class="table-responsive mt-3">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Username</th>
+              <th scope="col">Password</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% admin.forEach((admin, index) => { %>
+              <tr>
+                <th scope="row"><%= index + 1 %></th>
+                <td class="w-25"><%= admin.username %></td>
+                <td><%= admin.password %></td>
+                <td>
+                  <div class="d-flex gap-2 text-nowrap">
+                    <a class="btn btn-primary btn-sm" href="/admin/<%= admin.id %>/edit" role="button">
+                      <i class="bi-pencil-fill"></i> Edit
+                    </a>
+        
+                    <form action="/admin/<%= admin.id %>?_method=DELETE" method="post">
+                      <button class="btn btn-danger btn-sm" type="submit">
+                        <i class="bi-trash-fill"></i> Hapus
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+    </div>
   </div>
 </body>
 <script

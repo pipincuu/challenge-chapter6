@@ -9,6 +9,10 @@ router.get("/", (req, res) => {
     res.render("pages/admin/login");
   });
 
+router.get("/dashboard", (req, res) => {
+  res.render("pages/home/index");
+});
+
 //LOGIN
 // router signin
 router.post("/login", (req, res) => {
@@ -20,7 +24,7 @@ router.post("/login", (req, res) => {
   }).then(admin => {
     if (admin) {
       Admin.findAll().then((admin) => {
-        res.render("pages/admin/index", {
+        res.render("pages/home/index", {
           admin,
         });
       });
@@ -152,72 +156,6 @@ router.delete('/users/:id', (req, res) => {
       });
 });
 
-//REST API
-//GET
-router.get("/api/users", (req, res) => {
-  User.findAll({
-    order: [["username", "ASC"]],
-    include: ["Biodata"],
-  })
-      .then(users => {
-          res.status(200).json(users)
-      })
-})
-
-// GET by ID
-router.get('/api/users/:id', (req, res) => {
-  User.findOne({
-      include: ["Biodata"],
-  }, 
-  {
-      where: { id: req.params.id }
-  })
-      .then(users => {
-          res.status(200).json(users)
-      })
-})
-
-//POST
-
-router.post('/api/users', (req, res) => {
-  User.create({
-      username: req.body.username,
-      password: req.body.password,
-  })
-      .then(user => {
-          res.status(201).json(user)
-      }) .catch(err => {
-          res.status(422).json("Tidak bisa menambahkan user")
-      })
-})
-
-//PUT
-router.put('/api/users/:id', (req, res) => {
-  User.update({
-      username: req.body.username,
-      password: req.body.password,
-  }, {
-      where: { id: req.params.id }
-  })
-      .then(user => {
-          res.status(201).json(user)
-  })  .catch(err => {
-          res.status(422).json("Tidak bisa mengubah user")
-  })
-})
-
-//DELETE 
-router.delete('/api/users/:id', (req, res) => {
-  User.destroy({
-      where: { id: req.params.id }
-  })
-      .then(user => {
-          res.sendStatus(204)
-      }) .catch(err => {
-          res.status(422).json("Tidak bisa menghapus user")
-      })
-})
-
 // BIODATA USER ROUTE
 
 // router.get("/biodata", (req, res) => {
@@ -331,9 +269,115 @@ router.delete("/biodata/:id", (req, res) => {
   });
 });
 
-//REST API
-//GET
+// HISTORY PAGE ROUTE
 
+router.get("/history", (req, res) => {
+  History.findAll({
+    include: ["user"],
+  }).then((history) => {
+    res.render("pages/history/index", {
+      history,
+    });
+  });
+});
+
+router.get("/history/create", (req, res) => {
+  User.findAll({
+    order: [["username", "ASC"]],
+  }).then((users) => {
+    res.render("pages/history/create", {
+      users,
+    });
+  });
+});
+
+router.post("/history", (req, res) => {
+  // Database tidak dapat menerima string kosong dalam memasukkan date
+  // Jadi harus dilakukan pengecekan untuk konversi string kosong jadi null
+  let playDate;
+  if (!req.body.playDate) {
+    playDate = null;
+  } else {
+    playDate = req.body.playDate;
+  }
+
+  History.create({
+    playDate: req.body.playDate,
+    resultGame: req.body.resultGame,
+    userId: req.body.userId,
+  }).then(() => {
+    res.redirect("/history");
+  });
+});
+
+//REST API 
+//REST API USER
+//GET
+router.get("/api/users", (req, res) => {
+  User.findAll({
+    order: [["username", "ASC"]],
+    include: ["Biodata"],
+  })
+      .then(users => {
+          res.status(200).json(users)
+      })
+})
+
+// GET by ID
+router.get('/api/users/:id', (req, res) => {
+  User.findOne({
+      include: ["Biodata"],
+  }, 
+  {
+      where: { id: req.params.id }
+  })
+      .then(users => {
+          res.status(200).json(users)
+      })
+})
+
+//POST
+
+router.post('/api/users', (req, res) => {
+  User.create({
+      username: req.body.username,
+      password: req.body.password,
+  })
+      .then(user => {
+          res.status(201).json(user)
+      }) .catch(err => {
+          res.status(422).json("Tidak bisa menambahkan user")
+      })
+})
+
+//PUT
+router.put('/api/users/:id', (req, res) => {
+  User.update({
+      username: req.body.username,
+      password: req.body.password,
+  }, {
+      where: { id: req.params.id }
+  })
+      .then(user => {
+          res.status(201).json(user)
+  })  .catch(err => {
+          res.status(422).json("Tidak bisa mengubah user")
+  })
+})
+
+//DELETE 
+router.delete('/api/users/:id', (req, res) => {
+  User.destroy({
+      where: { id: req.params.id }
+  })
+      .then(user => {
+          res.sendStatus(204)
+      }) .catch(err => {
+          res.status(422).json("Tidak bisa menghapus user")
+      })
+})
+
+//REST API BIODATA
 router.get("/api/biodata", (req, res) => {
   Biodata.findAll({
     order: [["firstName", "ASC"]],
@@ -408,59 +452,42 @@ router.delete('/api/biodata/:id', (req, res) => {
       })
 })
 
-// HISTORY PAGE ROUTE
-
-router.get("/history", (req, res) => {
+//REST API HISTORY
+router.get("/api/history", (req, res) => {
   History.findAll({
     include: ["user"],
   }).then((history) => {
-    res.render("pages/history/index", {
-      history,
-    });
+    res.json(history);
   });
 });
 
-router.get("/history/create", (req, res) => {
-  User.findAll({
-    order: [["username", "ASC"]],
-  }).then((users) => {
-    res.render("pages/history/create", {
-      users,
-    });
-  });
-});
+// GET by ID
+router.get('/api/history/:id', (req, res) => {
+  History.findOne({
+      include: ["user"],
+  },
+  {
+      where: { id: req.params.id }
+  })
+      .then(history => {
+          res.status(200).json(history)
+      })
+})
 
-router.post("/history", (req, res) => {
-  // Database tidak dapat menerima string kosong dalam memasukkan date
-  // Jadi harus dilakukan pengecekan untuk konversi string kosong jadi null
-  let playDate;
-  if (!req.body.playDate) {
-    playDate = null;
-  } else {
-    playDate = req.body.playDate;
-  }
+//POST
 
+router.post('/api/history', (req, res) => {
   History.create({
     playDate: req.body.playDate,
     resultGame: req.body.resultGame,
     userId: req.body.userId,
-  }).then(() => {
-    res.redirect("/history");
-  });
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
+  })
+      .then(history => {
+          res.status(201).json(history)
+      }) .catch(err => {
+          res.status(422).json("Tidak bisa menambahkan history")
+      })
+})
 
 
 module.exports = router;
