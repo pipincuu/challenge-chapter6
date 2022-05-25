@@ -408,6 +408,50 @@ router.delete('/api/biodata/:id', (req, res) => {
       })
 })
 
+// HISTORY PAGE ROUTE
+
+router.get("/history", (req, res) => {
+  History.findAll({
+    include: ["user"],
+  }).then((history) => {
+    res.render("pages/history/index", {
+      history,
+    });
+  });
+});
+
+router.get("/history/create", (req, res) => {
+  User.findAll({
+    order: [["username", "ASC"]],
+  }).then((users) => {
+    res.render("pages/history/create", {
+      users,
+    });
+  });
+});
+
+router.post("/history", (req, res) => {
+  // Database tidak dapat menerima string kosong dalam memasukkan date
+  // Jadi harus dilakukan pengecekan untuk konversi string kosong jadi null
+  let playDate;
+  if (!req.body.playDate) {
+    playDate = null;
+  } else {
+    playDate = req.body.playDate;
+  }
+
+  History.create({
+    playDate: req.body.playDate,
+    resultGame: req.body.resultGame,
+    userId: req.body.userId,
+  }).then(() => {
+    res.redirect("/history");
+  });
+});
+
+
+
+
 
 
 
